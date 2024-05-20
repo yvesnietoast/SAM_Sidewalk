@@ -1,0 +1,37 @@
+version: "3"
+
+services:
+  project:
+    build:
+      context: ../
+      dockerfile: ./docker/Dockerfile
+      args:
+        - username=yves
+        - userid=1000
+    container_name: project
+    image: ageron/handson-ml3:latest
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: 50m
+    ports:
+      - "8888:8888"
+      - "6006:6006"
+      - "3000:3000"
+    volumes:
+      - ../:/home/yves/project
+    command: /opt/conda/envs/project/bin/jupyter notebook --ip='0.0.0.0' --port=8888 --no-browser
+  postgres_db:
+    image: pgvector/pgvector:pg16
+    ports:
+      - "5432:5432"  # Adjust the port as needed
+    environment:
+      POSTGRES_DB: your_database_name
+      POSTGRES_USER: your_database_user
+      POSTGRES_PASSWORD: your_database_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data  # Mount volume for persistent data storage
+
+volumes:
+  postgres_data:  # Volume for PostgreSQL data storage
